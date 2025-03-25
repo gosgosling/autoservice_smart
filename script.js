@@ -5,21 +5,19 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // ID чатов для разных специалистов
     const SPECIALIST_CHATS = {
-        'Автоэлектрик': '372812183', // Замените на ID чата автоэлектрика
-        'Юрист': 'CHAT_ID_LAWYER', // Замените на ID чата юриста
-        'Грузовые машины': 'CHAT_ID_TRUCKS' // Замените на ID чата специалиста по грузовикам
+        'Автоэлектрик': '372812183', // ID чата автоэлектрика
+        'Юрист': 'CHAT_ID_LAWYER', // ID чата юриста
+        'Грузовые машины': 'CHAT_ID_TRUCKS' // ID чата специалиста по грузовикам
     };
 
     // Обработка ввода телефона
     phoneInput.addEventListener('input', function(e) {
-        let value = e.target.value.replace(/\D/g, ''); // Оставляем только цифры
+        let value = e.target.value.replace(/\D/g, '');
 
-        // Если первая цифра не 8, очищаем поле
         if (value.length > 0 && value[0] !== '8') {
             value = '';
         }
 
-        // Ограничиваем длину до 11 цифр
         if (value.length > 11) {
             value = value.slice(0, 11);
         }
@@ -47,67 +45,98 @@ document.addEventListener('DOMContentLoaded', function() {
         yearSelect.appendChild(option);
     }
 
-    // Токен бота
-    const BOT_TOKEN = '7846913510:AAGw8ZQNutYVSNfVJwqdyQ8jH7naUrcMZ0I';
-    const DEFAULT_CHAT_ID = 'YOUR_DEFAULT_CHAT_ID'; // ID чата по умолчанию
-    const TELEGRAM_API = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`;
+    const DEFAULT_CHAT_ID = '372812183'; // ID чата по умолчанию
 
     form.addEventListener('submit', async function(e) {
         e.preventDefault();
 
+        // Собираем данные формы и удаляем пробелы по краям
         const formData = {
-            name: document.getElementById('name').value,
-            organization: document.getElementById('organization').value,
-            phone: document.getElementById('phone').value,
-            specialist: document.getElementById('specialist').value,
-            vin: document.getElementById('vin').value,
-            year: document.getElementById('year').value,
-            description: document.getElementById('description').value
+            name: document.getElementById('name').value.trim(),
+            organization: document.getElementById('organization').value.trim(),
+            phone: document.getElementById('phone').value.trim(),
+            specialist: document.getElementById('specialist').value.trim(),
+            vin: document.getElementById('vin').value.trim(),
+            year: document.getElementById('year').value.trim(),
+            description: document.getElementById('description').value.trim()
         };
 
+        // Проверяем обязательные поля
+        if (!formData.name || !formData.phone) {
+            alert('Пожалуйста, заполните обязательные поля (имя и телефон)');
+            return;
+        }
+
         const message = formatMessage(formData);
+
+        // Проверяем, что сообщение не пустое
+        if (!message.trim()) {
+            alert('Ошибка формирования сообщения. Пожалуйста, проверьте введенные данные.');
+            return;
+        }
 
         try {
             // Определяем ID чата в зависимости от выбранного специалиста
             const chatId = formData.specialist ? SPECIALIST_CHATS[formData.specialist] || DEFAULT_CHAT_ID : DEFAULT_CHAT_ID;
 
-            const response = await fetch(TELEGRAM_API, {
+            console.log('Отправка данных:', { chatId, message }); // Логируем данные для отладки
+
+            const response = await fetch('/api/send-telegram', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    chat_id: chatId,
-                    text: message,
-                    parse_mode: 'HTML'
+                    chatId: chatId,
+                    message: message
                 })
             });
 
-            if (response.ok) {
-                form.reset();
-                successModal.show();
-            } else {
-                throw new Error('Ошибка отправки сообщения');
+            // Проверяем успешность запроса
+            if (!response.ok) {
+                let errorMessage = 'Ошибка отправки сообщения';
+
+                try {
+                    // Пытаемся получить JSON с деталями ошибки
+                    const errorData = await response.json();
+                    errorMessage = errorData.error || errorData.details || errorMessage;
+                } catch (jsonError) {
+                    // Если ответ не является JSON, получаем текст ошибки
+                    errorMessage = await response.text() || errorMessage;
+                }
+
+                throw new Error(errorMessage);
             }
+
+            // Получаем данные только если запрос успешен
+            const data = await response.json();
+            console.log('Успешный ответ:', data);
+
+            form.reset();
+            successModal.show();
         } catch (error) {
-            alert('Произошла ошибка при отправке заявки. Пожалуйста, попробуйте позже.');
-            console.error('Error:', error);
+            console.error('Ошибка при отправке формы:', error);
+            alert(`Произошла ошибка при отправке заявки: ${error.message}`);
         }
     });
 });
 
 function formatMessage(data) {
-    return `
-<b>Новая заявка на обслуживание</b>
+    // Форматируем сообщение с проверкой на пустые значения
+    const message = `
+<b>🔔 Новая заявка на обслуживание</b>
 
-<b>Имя:</b> ${data.name}
-<b>Организация:</b> ${data.organization || 'Не указано'}
-<b>Телефон:</b> ${data.phone}
-<b>Специалист:</b> ${data.specialist || 'Не указано'}
-<b>VIN авто:</b> ${data.vin || 'Не указано'}
-<b>Год авто:</b> ${data.year || 'Не указано'}
+<b>👤 Имя:</b> ${data.name || 'Не указано'}
+<b>🏢 Организация:</b> ${data.organization || 'Не указано'}
+<b>📱 Телефон:</b> ${data.phone || 'Не указано'}
+<b>👨‍🔧 Специалист:</b> ${data.specialist || 'Не указано'}
+<b>🚗 VIN авто:</b> ${data.vin || 'Не указано'}
+<b>📅 Год авто:</b> ${data.year || 'Не указано'}
 
-<b>Описание проблемы:</b>
+<b>📝 Описание проблемы:</b>
 ${data.description || 'Не указано'}
-    `.trim();
+
+<i>Заявка отправлена: ${new Date().toLocaleString('ru-RU')}</i>`;
+
+    return message.trim();
 }
