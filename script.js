@@ -2,6 +2,17 @@ document.addEventListener('DOMContentLoaded', function() {
     const form = document.getElementById('serviceForm');
     const successModal = new bootstrap.Modal(document.getElementById('successModal'));
     const phoneInput = document.getElementById('phone');
+    const urgencyCheck = document.getElementById('urgencyCheck');
+    const urgencyPrice = document.querySelector('.urgency-price');
+
+    // Показываем/скрываем сообщение о двойной цене при клике на чекбокс срочности
+    urgencyCheck.addEventListener('change', function() {
+        if (this.checked) {
+            urgencyPrice.classList.remove('d-none');
+        } else {
+            urgencyPrice.classList.add('d-none');
+        }
+    });
 
     // ID чатов для разных специалистов
     const SPECIALIST_CHATS = {
@@ -58,7 +69,10 @@ document.addEventListener('DOMContentLoaded', function() {
             specialist: document.getElementById('specialist').value.trim(),
             vin: document.getElementById('vin').value.trim(),
             year: document.getElementById('year').value.trim(),
-            description: document.getElementById('description').value.trim()
+            description: document.getElementById('description').value.trim(),
+            completedWorks: document.getElementById('completedWorks').value.trim(),
+            urgency: document.getElementById('urgencyCheck').checked,
+            serviceType: document.querySelector('input[name="serviceType"]:checked').value
         };
 
         // Проверяем обязательные поля
@@ -135,6 +149,12 @@ function formatMessage(data) {
 
 <b>📝 Описание проблемы:</b>
 ${data.description || 'Не указано'}
+
+<b>🔧 Выполненные работы:</b>
+${data.completedWorks || 'Не указано'}
+
+<b>⏱ Срочность:</b> ${data.urgency ? 'Да (двойная стоимость)' : 'Нет'}
+<b>🛎 Требуется:</b> ${data.serviceType}
 
 <i>Заявка отправлена: ${new Date().toLocaleString('ru-RU')}</i>`;
 

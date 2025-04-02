@@ -61,6 +61,39 @@
                     <textarea class="form-control" id="description" rows="4"></textarea>
                 </div>
 
+                <div class="mb-3">
+                    <label for="completedWorks" class="form-label">Какие были выполнены работы?</label>
+                    <textarea class="form-control" id="completedWorks" rows="3"></textarea>
+                </div>
+
+                <div class="mb-4">
+                    <div class="urgency-container">
+                        <div class="urgency-content">
+                            <input class="form-check-input" type="checkbox" id="urgencyCheck">
+                            <label class="form-check-label" for="urgencyCheck">Срочность</label>
+                            <span class="urgency-price d-none text-danger">Стоимость X2</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label">Требуется</label>
+                    <div class="service-options">
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="serviceType" id="consultationOption" value="Консультация" checked>
+                            <label class="form-check-label" for="consultationOption">Консультация</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="serviceType" id="visitOption" value="Выезд">
+                            <label class="form-check-label" for="visitOption">Выезд специалиста</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="serviceType" id="bothOption" value="Консультация и выезд">
+                            <label class="form-check-label" for="bothOption">Консультация и выезд</label>
+                        </div>
+                    </div>
+                </div>
+
                 <button type="submit" class="btn btn-primary w-100">Отправить заявку</button>
             </form>
         </div>

@@ -56,11 +56,75 @@ body {
     padding: 2rem;
 }
 
+
+/* Новые стили для блока срочности */
+
+.urgency-container {
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    padding: 0.8rem;
+}
+
+.urgency-content {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.form-check-input {
+    margin: 0;
+    margin-right: 10px;
+    flex-shrink: 0;
+}
+
+.form-check-label {
+    margin-right: 10px;
+    flex-shrink: 0;
+}
+
+.urgency-price {
+    font-weight: 500;
+    font-size: 0.9rem;
+    color: #dc3545;
+    animation: pulse 1.5s infinite;
+    flex-shrink: 0;
+}
+
+.service-options {
+    padding: 0.5rem 0;
+}
+
+.form-check-inline {
+    margin-right: 1.5rem;
+}
+
+@keyframes pulse {
+    0% {
+        opacity: 0.7;
+    }
+    50% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0.7;
+    }
+}
+
 @media (max-width: 768px) {
     .container {
         padding: 0 1rem;
     }
     .form-container {
         padding: 1.5rem;
+    }
+    .urgency-container {
+        padding: 0.6rem;
+    }
+    .urgency-content {
+        justify-content: flex-start;
+    }
+    .service-options .form-check-inline {
+        margin-right: 0.5rem;
+        margin-bottom: 0.5rem;
     }
 }
